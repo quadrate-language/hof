@@ -1,0 +1,10 @@
+{
+	"name": "hof",
+	"version": "0.1.0",
+	"namespace": "hof",
+	"description": "Higher-order function combinators for functional programming",
+	"license": "Apache-2.0",
+	"repository": "https://github.com/quadrate-language/hof",
+	"keywords": ["functional", "combinators", "higher-order"],
+	"quadrate": ">=0.4.0"
+}
