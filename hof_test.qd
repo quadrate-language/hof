@@ -91,3 +91,78 @@ test "hof::bi_star" {
 	a 4 testing::assert_eq   // 3 + 1 = 4
 	b 8 testing::assert_eq   // 4 * 2 = 8
 }
+
+test "hof::fold_right" {
+	// fold_right: fold from the right side
+	0 make<i64> 1 append 2 append 3 append -> arr
+	// Subtraction to show right-to-left: 1 - (2 - (3 - 0)) = 1 - (2 - 3) = 1 - (-1) = 2
+	arr 3 0 fn (acc:i64 x:i64 -- r:i64) { -> x -> acc x acc - } hof::fold_right 2 testing::assert_eq
+	arr free
+}
+
+test "hof::map" {
+	// map: apply function to each element
+	0 make<i64> 1 append 2 append 3 append -> arr
+	arr 3 fn (x:i64 -- r:i64) { 2 * } hof::map -> count -> result
+	count 3 testing::assert_eq
+	result 0 nth 2 testing::assert_eq   // 1 * 2
+	result 1 nth 4 testing::assert_eq   // 2 * 2
+	result 2 nth 6 testing::assert_eq   // 3 * 2
+	result free
+	arr free
+}
+
+test "hof::filter" {
+	// filter: keep elements matching predicate
+	0 make<i64> 1 append 2 append 3 append 4 append 5 append -> arr
+	arr 5 fn (x:i64 -- r:i64) { 2 % 0 == } hof::filter -> count -> result
+	count 2 testing::assert_eq  // 2 and 4 are even
+	result 0 nth 2 testing::assert_eq
+	result 1 nth 4 testing::assert_eq
+	result free
+	arr free
+}
+
+test "hof::any" {
+	// any: check if any element matches predicate
+	0 make<i64> 1 append 3 append 5 append -> odds
+	0 make<i64> 2 append 4 append 6 append -> evens
+
+	// Check if any odd number is even (should be false)
+	odds 3 fn (x:i64 -- r:i64) { 2 % 0 == } hof::any testing::assert_false
+
+	// Check if any even number is even (should be true)
+	evens 3 fn (x:i64 -- r:i64) { 2 % 0 == } hof::any testing::assert_true
+
+	odds free
+	evens free
+}
+
+test "hof::all" {
+	// all: check if all elements match predicate
+	0 make<i64> 2 append 4 append 6 append -> evens
+	0 make<i64> 2 append 3 append 4 append -> mixed
+
+	// Check if all are even
+	evens 3 fn (x:i64 -- r:i64) { 2 % 0 == } hof::all testing::assert_true
+	mixed 3 fn (x:i64 -- r:i64) { 2 % 0 == } hof::all testing::assert_false
+
+	evens free
+	mixed free
+}
+
+test "hof::find" {
+	// find: find first element matching predicate
+	0 make<i64> 1 append 2 append 3 append 4 append -> arr
+
+	// Find first even number
+	arr 4 fn (x:i64 -- r:i64) { 2 % 0 == } hof::find -> found -> elem
+	found testing::assert_true
+	elem 2 testing::assert_eq
+
+	// Find number greater than 10 (not found)
+	arr 4 fn (x:i64 -- r:i64) { 10 > } hof::find -> found -> elem
+	found testing::assert_false
+
+	arr free
+}
