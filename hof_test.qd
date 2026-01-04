@@ -1,0 +1,71 @@
+// Unit tests for the hof (higher-order functions) module
+use hof
+use testing
+
+test "hof::apply" {
+	5 fn (x:i64 -- r:i64) { 2 * } hof::apply 10 testing::assert_eq
+	10 fn (x:i64 -- r:i64) { 3 + } hof::apply 13 testing::assert_eq
+	7 fn (x:i64 -- r:i64) { dup * } hof::apply 49 testing::assert_eq
+}
+
+test "hof::bi" {
+	5 fn (x:i64 -- r:i64) { 1 + } fn (x:i64 -- r:i64) { 2 * } hof::bi
+	-> b -> a
+	a 6 testing::assert_eq
+	b 10 testing::assert_eq
+}
+
+test "hof::both" {
+	3 4 fn (x:i64 -- r:i64) { 2 * } hof::both
+	-> b -> a
+	a 6 testing::assert_eq
+	b 8 testing::assert_eq
+}
+
+test "hof::compose" {
+	fn (x:i64 -- r:i64) { 1 + } fn (x:i64 -- r:i64) { 2 * } hof::compose -> f
+	5 f hof::apply 12 testing::assert_eq  // (5 + 1) * 2 = 12
+}
+
+test "hof::dip" {
+	3 4 fn ( -- ) { 10 + } hof::dip
+	-> top -> below
+	below 13 testing::assert_eq
+	top 4 testing::assert_eq
+}
+
+test "hof::keep" {
+	5 fn (x:i64 -- r:i64) { 2 * } hof::keep
+	-> result -> kept
+	kept 5 testing::assert_eq
+	result 10 testing::assert_eq
+}
+
+test "hof::times" {
+	0 5 fn ( -- ) { 1 + } hof::times 5 testing::assert_eq
+	1 4 fn ( -- ) { 2 * } hof::times 16 testing::assert_eq
+}
+
+test "hof::when" {
+	5 1 fn ( -- ) { 10 + } hof::when 15 testing::assert_eq
+	5 0 fn ( -- ) { 10 + } hof::when 5 testing::assert_eq
+}
+
+test "hof::unless" {
+	5 0 fn ( -- ) { 10 + } hof::unless 15 testing::assert_eq
+	5 1 fn ( -- ) { 10 + } hof::unless 5 testing::assert_eq
+}
+
+test "hof::fold" {
+	0 make<i64> 1 append 2 append 3 append 4 append 5 append -> arr
+	arr 5 0 fn (acc:i64 x:i64 -- r:i64) { -> x -> acc acc x + } hof::fold 15 testing::assert_eq
+	arr free
+}
+
+test "hof::tri" {
+	10 fn (x:i64 -- r:i64) { 1 + } fn (x:i64 -- r:i64) { 2 * } fn (x:i64 -- r:i64) { 3 - } hof::tri
+	-> c -> b -> a
+	a 11 testing::assert_eq
+	b 20 testing::assert_eq
+	c 7 testing::assert_eq
+}
