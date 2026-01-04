@@ -69,3 +69,25 @@ test "hof::tri" {
 	b 20 testing::assert_eq
 	c 7 testing::assert_eq
 }
+
+test "hof::curry" {
+	// curry: fix first argument
+	5 fn (a:i64 b:i64 -- r:i64) { -> b -> a a b + } hof::curry -> add5
+	10 add5 call 15 testing::assert_eq
+	20 add5 call 25 testing::assert_eq
+}
+
+test "hof::curry_right" {
+	// curry_right: fix second argument
+	2 fn (a:i64 b:i64 -- r:i64) { -> b -> a a b / } hof::curry_right -> half
+	10 half call 5 testing::assert_eq
+	100 half call 50 testing::assert_eq
+}
+
+test "hof::bi_star" {
+	// bi_star applies different functions to two values
+	3 4 fn (x:i64 -- r:i64) { 1 + } fn (x:i64 -- r:i64) { 2 * } hof::bi_star
+	-> b -> a
+	a 4 testing::assert_eq   // 3 + 1 = 4
+	b 8 testing::assert_eq   // 4 * 2 = 8
+}
